@@ -5,7 +5,6 @@ from azure.keyvault.secrets import SecretClient
 from azure.identity import DefaultAzureCredential
 
 AZURE_KEY_VAULT_URL = os.environ["AZURE_KEY_VAULT_URL"]
-#KVUri = f"https://{keyVaultName}.vault.azure.net/"
 
 credential = DefaultAzureCredential()
 client = SecretClient(vault_url=AZURE_KEY_VAULT_URL, credential=credential)
@@ -14,6 +13,7 @@ _dbhostname = client.get_secret('DBHOSTNAME')
 _dbusername = client.get_secret('DBUSERNAME')
 _dbpassword = client.get_secret('DBPASSWORD')
 _dbname = client.get_secret('DBNAME')
+_secret = client.get_secret('SECRET_KEY')
 
 conn = pymysql.connect(
         host = _dbhostname.value, #os.environ.get('DBHOSTNAME'),
@@ -24,7 +24,7 @@ conn = pymysql.connect(
         cursorclass = pymysql.cursors.DictCursor)  
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = _secret.value
 
 @app.route('/', methods=['GET'])
 def index():
